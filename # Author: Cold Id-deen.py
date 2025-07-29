@@ -6,13 +6,16 @@
 from alive_progress import alive_bar
 import time 
 
-# Using another Python Libary to start different loading bar as tqdm.
+# Using another Python Library to start different loading bar as tqdm.
 from time import sleep
 from tqdm import tqdm
 
 # Importing Python modules to generate random characters for password
 import random 
 import string 
+
+# Combine letters, digits, and punctuation into one pool of characters
+characters = string.ascii_letters + string.digits + string.punctuation
 
 # Setting the loading bar using alive_bar with 10 steps, a title, spinner style, and a smooth bar style
 with alive_bar(10, title='LOADING: ', spinner='dots', bar='smooth') as bar:
@@ -65,13 +68,28 @@ while True:
     else:
         # If the input is valid, move forward with the password creation
         print(f"Perfect! Creating a {password_input}-character password...")
-        ready = input("Are you ready? (Y/N): ").upper()  # Ask for confirmation again and convert to uppercase
 
-        if ready == "Y":
-            # Show a loading bar while generating password
-            for i in tqdm(range(10), desc=" CREATING PASSWORD: "):
-                sleep(0.5)
-        else:
-            # If the user says no, cancel the generation
-            print("Cancelled by user! ")
-        break  # Exit the while loop after valid input
+    # Ask the user again if they're ready to continue
+    ready = input("Are you ready? (Y/N): ").upper()  # Ask for confirmation again and convert to uppercase
+
+    if ready == "Y":
+        # Show custom loading bar with 10 steps
+        total = 10
+        for i in range(1, total + 1):  # Loop from 1 to 10
+            progress = i / total * 100  # Calculate the percentage progress
+            bar_length = 10  # Total length of the visual bar
+            filled_length = int(bar_length * progress / 100)  # Calculate how much of the bar is filled
+            bar = '?' * filled_length + '-' * (bar_length - filled_length)  # Create the visual bar using ? and -
+            print(f"Progress: [{bar}] {progress:.1f}%")  # Show the bar with percentage
+            sleep(0.3)  # Add a small delay so the loading bar is visible
+
+        # Generate the password after the progress bar is done
+        password = ''.join(random.choices(characters, k=password_input))  # Randomly pick characters and join them
+        print("\n Sucessfully! Your new password is:", password)  # Print the final password
+
+    elif ready == "N":
+        # If the user says no, cancel the generation
+        print(f"ERROR! --> Cancelled by {name}!")  # Print who cancelled it
+
+    # Always break after a valid input + process to exit the loop
+    break
